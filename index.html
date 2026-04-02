@@ -18,29 +18,42 @@
   </div>
 
   <script>
-    const LIFF_ID = '2009388530-kWGz3A46'; 
-    const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdxQuguSHHo3ltuOfIuYeKSrrYIQuLm1YTzRWdnOO_BE09eNg/viewform'; 
-    const ENTRY_ID = 'entry.298464274';
+  // --- 【設定】 ---
+  const LIFF_ID = '2009388530-kWGz3A46'; 
+  const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdxQuguSHHo3ltuOfIuYeKSrrYIQuLm1YTzRWdnOO_BE09eNg/viewform'; 
+  
+  const ENTRY_ID_UID = 'entry.298464274';   // UID用のID
+  const ENTRY_ID_NAME = 'entry.732633067';  // 名前用のID（新しく特定したもの）
+  // ---------------
 
-    async function main() {
-      try {
-        await liff.init({ liffId: LIFF_ID });
-        if (!liff.isLoggedIn()) {
-          liff.login();
-        } else {
-          const profile = await liff.getProfile();
-          const finalUrl = `${FORM_URL}?${ENTRY_ID}=${profile.userId}`;
-          
-          document.getElementById('msg').innerText = '準備が整いました。';
-          const btn = document.getElementById('startBtn');
-          btn.style.display = 'block';
-          btn.onclick = () => { window.location.href = finalUrl; };
-        }
-      } catch (err) {
-        alert('LIFF Error: ' + err.message);
+  async function main() {
+    try {
+      await liff.init({ liffId: LIFF_ID });
+      if (!liff.isLoggedIn()) {
+        liff.login();
+      } else {
+        const profile = await liff.getProfile();
+        
+        // データの取得
+        const userId = profile.userId;
+        // 名前は特殊な文字（絵文字や空白）が含まれる可能性があるため、安全な形式に変換（エンコード）します
+        const displayName = encodeURIComponent(profile.displayName);
+        
+        // URLを合体させる（& で繋ぎます）
+        const finalUrl = `${FORM_URL}?${ENTRY_ID_UID}=${userId}&${ENTRY_ID_NAME}=${displayName}`;
+        
+        document.getElementById('msg').innerText = '準備が整いました。';
+        const btn = document.getElementById('startBtn');
+        btn.style.display = 'block';
+        btn.onclick = () => {
+          window.location.href = finalUrl;
+        };
       }
+    } catch (err) {
+      alert('LIFF Error: ' + err.message);
     }
-    main();
-  </script>
+  }
+  main();
+</script>
 </body>
 </html>
